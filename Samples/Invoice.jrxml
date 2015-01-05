@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-05T20:03:09 -->
+<!-- 2015-01-05T20:10:45 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="77f62705-562e-4973-b813-d2af08ae2a10">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
@@ -103,7 +103,8 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 	store.store_country,
 	store.store_manager,
 	store.store_phone,
-	store.store_fax
+	store.store_fax,
+	store.store_state
 FROM sales_fact_1997 AS sales
 JOIN time_by_day AS time ON sales.time_id = time.time_id
 JOIN customer ON sales.customer_id = customer.customer_id
@@ -135,6 +136,7 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 	<field name="store_manager" class="java.lang.String"/>
 	<field name="store_phone" class="java.lang.String"/>
 	<field name="store_fax" class="java.lang.String"/>
+	<field name="store_state" class="java.lang.String"/>
 	<variable name="TOTAL_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{price}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
@@ -401,7 +403,7 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 + IF($F{cust_address2} != null,$F{cust_address2} + "\n","")
 + IF($F{cust_address3} != null,$F{cust_address3} + "\n","")
 + IF($F{cust_address4} != null,$F{cust_address4} + "\n","")
-+ $F{cust_city} + "\n"
++ $F{cust_city} + ", " + $F{cust_region} + "\n"
 + $F{cust_zip} + "\n"
 + $F{cust_country}]]></textFieldExpression>
 			</textField>
@@ -483,7 +485,7 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 				<textElement textAlignment="Left" verticalAlignment="Top"/>
 				<textFieldExpression><![CDATA[$F{store_name} + "\n"
 + $F{store_street_address} + "\n"
-+ $F{store_city} + "\n"
++ $F{store_city} + ", " + $F{store_state} + "\n"
 + $F{store_postal_code} + "\n"
 + $F{store_country} + "\n"
 + $F{store_phone} + "\n"
