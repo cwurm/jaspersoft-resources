@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-05T16:27:27 -->
+<!-- 2015-01-05T20:03:09 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="77f62705-562e-4973-b813-d2af08ae2a10">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
@@ -95,7 +95,15 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 	customer.phone2 AS cust_phone2,
 	customer.gender AS cust_gender,
 	customer.member_card AS cust_member_card,
-	time.the_date
+	time.the_date,
+	store.store_name,
+	store.store_street_address,
+	store.store_city,
+	store.store_postal_code,
+	store.store_country,
+	store.store_manager,
+	store.store_phone,
+	store.store_fax
 FROM sales_fact_1997 AS sales
 JOIN time_by_day AS time ON sales.time_id = time.time_id
 JOIN customer ON sales.customer_id = customer.customer_id
@@ -119,6 +127,14 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 	<field name="cust_address3" class="java.lang.String"/>
 	<field name="cust_address4" class="java.lang.String"/>
 	<field name="price" class="java.math.BigDecimal"/>
+	<field name="store_name" class="java.lang.String"/>
+	<field name="store_street_address" class="java.lang.String"/>
+	<field name="store_city" class="java.lang.String"/>
+	<field name="store_postal_code" class="java.lang.String"/>
+	<field name="store_country" class="java.lang.String"/>
+	<field name="store_manager" class="java.lang.String"/>
+	<field name="store_phone" class="java.lang.String"/>
+	<field name="store_fax" class="java.lang.String"/>
 	<variable name="TOTAL_AMOUNT" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{price}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
@@ -371,14 +387,14 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 				<textFieldExpression><![CDATA[TEXT($V{TOTAL_AMOUNT}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement style="Text" x="0" y="40" width="40" height="10" uuid="cbff1b94-f983-4878-bb31-28b4ef123ae3"/>
+				<reportElement style="Text" x="170" y="40" width="30" height="10" uuid="cbff1b94-f983-4878-bb31-28b4ef123ae3"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Bill To"]]></textFieldExpression>
 			</textField>
 			<textField pattern="MMMMM dd, yyyy">
-				<reportElement style="Text" x="40" y="50" width="100" height="50" uuid="49d511df-7021-46b2-8944-b42621793717"/>
+				<reportElement style="Text" x="200" y="50" width="100" height="50" uuid="49d511df-7021-46b2-8944-b42621793717"/>
 				<textElement textAlignment="Left" verticalAlignment="Top"/>
 				<textFieldExpression><![CDATA[$F{cust_name} + "\n"
 + $F{cust_address1} + "\n"
@@ -449,6 +465,31 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 					<pen lineWidth="0.5"/>
 				</graphicElement>
 			</line>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement style="Text" x="0" y="40" width="45" height="10" uuid="60114383-d92d-4a91-befc-a162d7f2e303">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bought At"]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement style="Text" x="45" y="50" width="100" height="50" uuid="d188cfb9-24d9-4402-b90d-7b07e2e99dd4">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{store_name} + "\n"
++ $F{store_street_address} + "\n"
++ $F{store_city} + "\n"
++ $F{store_postal_code} + "\n"
++ $F{store_country} + "\n"
++ $F{store_phone} + "\n"
++ $F{store_fax} + "\n"
++ "Manager: " + $F{store_manager}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>
