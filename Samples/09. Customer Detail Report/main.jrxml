@@ -1,0 +1,1437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-01-05T16:32:21 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CustomerOverviewReport" pageWidth="1000" pageHeight="640" orientation="Landscape" columnWidth="1000" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="20" resourceBundle="supermart" whenResourceMissingType="Key" uuid="ee0d6210-7a1e-4dde-95a9-fde1f0f5c550">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="53"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/Samples/Reports/9.CustomerDetailReport"/>
+	<property name="ireport.jasperserver.url" value="http://192.168.2.141:8102/jasperserver-pro/"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/Samples/Reports/9.CustomerDetailReport_files/main_jrxml"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<template><![CDATA["repo:SampleReportStyles.jrtx"]]></template>
+	<style name="defaultStyle" fontName="Calibri">
+		<box padding="2"/>
+	</style>
+	<subDataset name="BrandPreferences" resourceBundle="supermart" whenResourceMissingType="Key" uuid="584f5306-d383-462c-b7c9-0d43a2df9be8">
+		<parameter name="custID" class="java.lang.Integer" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT
+     sum(sales_fact_1997.unit_sales)as unit_sales,
+     product.brand_name AS product_brand_name
+FROM
+     sales_fact_1997 sales_fact_1997 INNER JOIN product product ON sales_fact_1997.product_id = product.product_id
+WHERE
+     sales_fact_1997.customer_id = $P{custID}
+GROUP BY
+     product.brand_name
+ORDER BY
+     unit_sales DESC]]>
+		</queryString>
+		<field name="unit_sales" class="java.math.BigDecimal"/>
+		<field name="product_brand_name" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="ShoppingDay" resourceBundle="supermart" whenResourceMissingType="Key" uuid="449dc8e9-3c70-48ba-ade9-c33283fbf86b">
+		<parameter name="customerId" class="java.lang.Integer" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT
+     case
+       when count_sales is null then 0
+       else count_sales
+     end               as count_sales,
+     days.the_date     as the_date,
+     days.the_day      as days_week_day, /* This column is returned only as quick validity check. It is not used in the report. */
+     days.day_of_week
+FROM
+     ( select * from time_by_day where time_id between 367 and 373 ) days /* This inline view gets an arbitrary week so that all weekdays are represented */
+     LEFT OUTER JOIN (
+          SELECT
+               count(distinct sales_fact_1997.time_id) as count_sales,
+               time_by_day.day_of_week as time_by_day_day_of_week
+          FROM
+               sales_fact_1997 sales_fact_1997
+               INNER JOIN time_by_day time_by_day ON sales_fact_1997.time_id = time_by_day.time_id
+          WHERE
+               sales_fact_1997.customer_id = $P{customerId}
+          GROUP BY
+               time_by_day.day_of_week
+      ) sales_by_day_of_week on days.day_of_week = sales_by_day_of_week.time_by_day_day_of_week
+ORDER BY
+     days.day_of_week]]>
+		</queryString>
+		<field name="count_sales" class="java.lang.Long"/>
+		<field name="days_week_day" class="java.lang.String"/>
+		<variable name="SimpleDayOfWeek" class="java.text.SimpleDateFormat">
+			<variableExpression><![CDATA[new SimpleDateFormat( "E", $P{REPORT_LOCALE} )]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="AvgSale" uuid="ea6e0cb9-a49d-46df-a26f-c2924e60810b">
+		<parameter name="custID" class="java.lang.Integer" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[SELECT
+     avg(agg_l_03_sales_fact_1997.store_sales) AS avg_ALL,
+     null AS customer_id,
+     'All Customers' as customers
+FROM
+     agg_l_03_sales_fact_1997 agg_l_03_sales_fact_1997
+union
+SELECT
+     avg(agg_l_03_sales_fact_1997.store_sales)AS avg_sales,
+     customer.customer_id AS customer_id,
+     substring(customer.fname,1,1) || '. ' || customer.lname AS customer_lname
+FROM
+     customer customer INNER JOIN agg_l_03_sales_fact_1997 agg_l_03_sales_fact_1997 ON customer.customer_id = agg_l_03_sales_fact_1997.customer_id
+WHERE
+     agg_l_03_sales_fact_1997.customer_id = $P{custID}
+GROUP BY
+     customer.customer_id,substring(customer.fname,1,1) || '. ' || customer.lname]]>
+		</queryString>
+		<field name="avg_all" class="java.math.BigDecimal"/>
+		<field name="customer_id" class="java.lang.Integer"/>
+		<field name="customers" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="customerId" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[2724]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA[".\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     avg(agg_l_03_sales_fact_1997.store_sales)AS avg_sales,
+     max(agg_l_03_sales_fact_1997.store_sales)AS max_sales,
+     min(agg_l_03_sales_fact_1997.store_sales)AS min_sales,
+     customer.customer_id AS customer_customer_id,
+     customer.account_num AS customer_account_num,
+     customer.lname AS customer_lname,
+     customer.fname AS customer_fname,
+     customer.mi AS customer_mi,
+     customer.address1 AS customer_address1,
+     customer.address2 AS customer_address2,
+     customer.address3 AS customer_address3,
+     customer.address4 AS customer_address4,
+     customer.city AS customer_city,
+     customer.state_province AS customer_state_province,
+     customer.postal_code AS customer_postal_code,
+     customer.country AS customer_country,
+     customer.customer_region_id AS customer_customer_region_id,
+     customer.phone1 AS customer_phone1,
+     customer.phone2 AS customer_phone2,
+     customer.birthdate AS customer_birthdate,
+     customer.marital_status AS customer_marital_status,
+     customer.yearly_income AS customer_yearly_income,
+     customer.gender AS customer_gender,
+     customer.total_children AS customer_total_children,
+     customer.num_children_at_home AS customer_num_children_at_home,
+     customer.education AS customer_education,
+     customer.date_accnt_opened AS customer_date_accnt_opened,
+     customer.member_card AS customer_member_card,
+     customer.occupation AS customer_occupation,
+     customer.houseowner AS customer_houseowner,
+     customer.num_cars_owned AS customer_num_cars_owned,
+     customer.fullname AS customer_fullname
+FROM
+     customer customer INNER JOIN agg_l_03_sales_fact_1997 agg_l_03_sales_fact_1997 ON customer.customer_id = agg_l_03_sales_fact_1997.customer_id
+WHERE
+     agg_l_03_sales_fact_1997.customer_id = $P{customerId}
+GROUP BY
+     customer.customer_id,
+     customer.account_num,
+     customer.lname,
+     customer.fname,
+     customer.mi,
+     customer.address1,
+     customer.address2,
+     customer.address3,
+     customer.address4,
+     customer.city,
+     customer.state_province,
+     customer.postal_code,
+     customer.country,
+     customer.customer_region_id,
+     customer.phone1,
+     customer.phone2,
+     customer.birthdate,
+     customer.marital_status,
+     customer.yearly_income,
+     customer.gender,
+     customer.total_children,
+     customer.num_children_at_home,
+     customer.education,
+     customer.date_accnt_opened,
+     customer.member_card,
+     customer.occupation,
+     customer.houseowner,
+     customer.num_cars_owned,
+     customer.fullname
+ORDER BY
+     customer.customer_id ASC]]>
+	</queryString>
+	<field name="avg_sales" class="java.math.BigDecimal"/>
+	<field name="max_sales" class="java.math.BigDecimal"/>
+	<field name="min_sales" class="java.math.BigDecimal"/>
+	<field name="customer_customer_id" class="java.lang.Integer"/>
+	<field name="customer_account_num" class="java.lang.Long"/>
+	<field name="customer_lname" class="java.lang.String"/>
+	<field name="customer_fname" class="java.lang.String"/>
+	<field name="customer_mi" class="java.lang.String"/>
+	<field name="customer_address1" class="java.lang.String"/>
+	<field name="customer_address2" class="java.lang.String"/>
+	<field name="customer_address3" class="java.lang.String"/>
+	<field name="customer_address4" class="java.lang.String"/>
+	<field name="customer_city" class="java.lang.String"/>
+	<field name="customer_state_province" class="java.lang.String"/>
+	<field name="customer_postal_code" class="java.lang.String"/>
+	<field name="customer_country" class="java.lang.String"/>
+	<field name="customer_customer_region_id" class="java.lang.Integer"/>
+	<field name="customer_phone1" class="java.lang.String"/>
+	<field name="customer_phone2" class="java.lang.String"/>
+	<field name="customer_birthdate" class="java.util.Date"/>
+	<field name="customer_marital_status" class="java.lang.String"/>
+	<field name="customer_yearly_income" class="java.lang.String"/>
+	<field name="customer_gender" class="java.lang.String"/>
+	<field name="customer_total_children" class="java.lang.Integer"/>
+	<field name="customer_num_children_at_home" class="java.lang.Integer"/>
+	<field name="customer_education" class="java.lang.String"/>
+	<field name="customer_date_accnt_opened" class="java.util.Date"/>
+	<field name="customer_member_card" class="java.lang.String"/>
+	<field name="customer_occupation" class="java.lang.String"/>
+	<field name="customer_houseowner" class="java.lang.String"/>
+	<field name="customer_num_cars_owned" class="java.lang.Integer"/>
+	<field name="customer_fullname" class="java.lang.String"/>
+	<variable name="SimpleMonth" class="java.text.SimpleDateFormat">
+		<variableExpression><![CDATA[new SimpleDateFormat( "MMM", $P{REPORT_LOCALE} )]]></variableExpression>
+	</variable>
+	<group name="CustomerGroup" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{customer_customer_id}]]></groupExpression>
+		<groupHeader>
+			<band height="320">
+				<property name="local_mesure_unitheight" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<frame>
+					<reportElement mode="Opaque" x="302" y="0" width="686" height="310" backcolor="#F7F7F8" uuid="f05fde67-31bb-478d-b3d2-d03a44392663">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<rectangle radius="1">
+						<reportElement mode="Opaque" x="10" y="10" width="290" height="141" backcolor="#F7F7F8" uuid="59b7ed99-5b04-4cf7-afce-102e0c212fcd">
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<graphicElement>
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						</graphicElement>
+					</rectangle>
+					<rectangle radius="1">
+						<reportElement mode="Opaque" x="310" y="10" width="364" height="292" backcolor="#F7F7F8" uuid="5c09343b-8fff-4ba0-b8b9-6ef1099bf5f0">
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<graphicElement>
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						</graphicElement>
+					</rectangle>
+					<rectangle radius="1">
+						<reportElement mode="Opaque" x="10" y="161" width="290" height="141" backcolor="#F7F7F8" uuid="3d9869cf-8183-4099-99a8-a5a12c26e782">
+							<property name="local_mesure_unitx" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.x" value="px"/>
+							<property name="local_mesure_unity" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.y" value="px"/>
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
+						<graphicElement>
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						</graphicElement>
+					</rectangle>
+				</frame>
+				<frame>
+					<reportElement mode="Opaque" x="12" y="0" width="280" height="310" backcolor="#F7F7F8" uuid="d53adc9f-78cc-4f9a-8f70-6568244b3740">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+				</frame>
+				<rectangle radius="2">
+					<reportElement x="22" y="10" width="260" height="140" uuid="39b1b0e9-a410-4c9c-832c-77693b416e8b">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</graphicElement>
+				</rectangle>
+				<rectangle radius="2">
+					<reportElement x="22" y="160" width="260" height="140" uuid="284763a1-caf6-4710-a359-f35ab70df118">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineColor="#D7DAD9"/>
+					</graphicElement>
+				</rectangle>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-9" style="h7" isPrintRepeatedValues="false" mode="Opaque" x="22" y="10" width="150" height="20" backcolor="#E9E9EB" uuid="034e6cb6-d694-426f-8fc7-d8a77e50c4ec">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Calibri" size="11"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$R{customer_phone1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="10" width="110" height="20" backcolor="#E9E9EB" uuid="ba636b63-1881-436d-84f9-34ce6b62d94a">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_phone1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-10" style="h7" mode="Opaque" x="22" y="30" width="150" height="20" backcolor="#DFE0E2" uuid="7ce31744-a7d1-485c-9cf5-9ebee7d25d0a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_phone2}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="30" width="110" height="20" backcolor="#DFE0E2" uuid="da5f5754-925f-441c-a168-97a1f8882578">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_phone2}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-11" style="h7" mode="Opaque" x="22" y="50" width="150" height="20" backcolor="#E9E9EB" uuid="6c66b9eb-1c10-4750-84ef-58a4752de315">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_marital_status}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="50" width="110" height="20" backcolor="#E9E9EB" uuid="ccad6ed8-4ca9-499f-9670-520b993296d7">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_marital_status}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="70" width="110" height="20" backcolor="#DFE0E2" uuid="1d837758-8bfe-4fe6-af57-5949f2aae1ed">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_yearly_income}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="70" width="150" height="20" backcolor="#DFE0E2" uuid="845d20a0-bb8c-49c4-aeef-8d364956d9a6">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_yearly_income}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="90" width="150" height="20" backcolor="#E9E9EB" uuid="20474493-389f-4361-8f73-5890cc3f9502">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_gender}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="90" width="110" height="20" backcolor="#E9E9EB" uuid="6a8b2ff1-4940-456c-a14f-af780dc61d2e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_gender}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="110" width="150" height="20" backcolor="#DFE0E2" uuid="22a68032-9d93-4949-8122-902fc8655bc3">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_total_children}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="110" width="110" height="20" backcolor="#DFE0E2" uuid="97ff6213-f01d-4cd3-9d2f-e950739adeb4">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_total_children}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="130" width="150" height="20" backcolor="#E9E9EB" uuid="38562407-26c0-42d8-ab92-062de149754e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_num_children_at_home}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="130" width="110" height="20" backcolor="#E9E9EB" uuid="1cb51ba6-8145-43f4-97a8-07f523b8a197">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_num_children_at_home}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="160" width="150" height="20" backcolor="#E9E9EB" uuid="a1e87cb6-5745-46ed-8310-df0a2afd3439">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_date_accnt_opened}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd-MMM-yy" isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="160" width="110" height="20" backcolor="#E9E9EB" uuid="a54e4221-11f6-4b58-b029-47946a082f9a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_date_accnt_opened}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="180" width="150" height="20" backcolor="#DFE0E2" uuid="36c1b48a-bcb0-4d75-9d0f-cce56b27390f">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_member_card}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="180" width="110" height="20" backcolor="#DFE0E2" uuid="320636ab-f01e-45d8-af39-74e3cb2b7e43">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_member_card}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="200" width="150" height="20" backcolor="#E9E9EB" uuid="b81f1c37-8976-4781-8aa9-136497132720">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_birthdate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd-MMM-yy" isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="200" width="110" height="20" backcolor="#E9E9EB" uuid="38547712-0008-49a6-ab4b-52c4da01c1b5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_birthdate}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="220" width="150" height="20" backcolor="#DFE0E2" uuid="1b425002-902c-4122-8673-aa8b188bb1d8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_education}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="220" width="110" height="20" backcolor="#DFE0E2" uuid="75f39f48-73f7-48f0-9cf7-de49947b6af4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_education}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="240" width="150" height="20" backcolor="#E9E9EB" uuid="31b22772-2b1a-412b-9e99-33f6e3b43a7c">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_occupation}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="240" width="110" height="20" backcolor="#E9E9EB" uuid="3133aac4-41f7-4350-a055-ff0eae91243e">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_occupation}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="260" width="150" height="20" backcolor="#DFE0E2" uuid="94d5c95d-7274-499c-b076-6cbd10af03e8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_houseowner}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="h8" mode="Opaque" x="172" y="260" width="110" height="20" backcolor="#DFE0E2" uuid="2e345c84-9f82-488d-9ace-9a03f88f5f08">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<leftPen lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_houseowner}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="" style="h7" mode="Opaque" x="22" y="280" width="150" height="20" backcolor="#E9E9EB" uuid="1099c4d2-ffe7-489d-8ec3-5132a921c85b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{customer_num_cars_owned}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" style="h8" mode="Opaque" x="172" y="280" width="110" height="20" backcolor="#E9E9EB" uuid="e9f9cf79-8951-4276-8cbd-99f0a920ead9">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="2" leftPadding="6" bottomPadding="2" rightPadding="6">
+						<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{customer_num_cars_owned}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement x="313" y="57" width="288" height="92" uuid="46b1487d-1530-4bb7-9608-e0ae86f7cb7c">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<hc:chart xmlns:hc="http://jaspersoft.com/highcharts" xsi:schemaLocation="http://jaspersoft.com/highcharts http://jaspersoft.com/schema/highcharts.xsd" type="Column">
+						<hc:chartSetting name="default">
+							<hc:chartProperty name="chart.backgroundColor">
+								<hc:propertyExpression><![CDATA[new java.awt.Color(-526344)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderColor">
+								<hc:propertyExpression><![CDATA["#D7DAD9"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderRadius">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.marginBottom">
+								<hc:propertyExpression><![CDATA[new Integer(25)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.spacingBottom">
+								<hc:propertyExpression><![CDATA[new Integer(10)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="colors">
+								<hc:propertyExpression><![CDATA[java.util.Arrays.asList("#0980BA","#AA4643","#89A54E","#80699B","#3D96AE","#DB843D","#92A8CD","#A47D7C","#B5CA92")]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.enabled">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.href">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.enabled">
+								<hc:propertyExpression><![CDATA[Boolean.FALSE]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.column.borderWidth">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.column.shadow">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.series.lineWidth">
+								<hc:propertyExpression><![CDATA[new Integer(2)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.labels.style.color">
+								<hc:propertyExpression><![CDATA["#58595B"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.labels.style.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.labels.style.fontSize">
+								<hc:propertyExpression><![CDATA["11px"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.lineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.tickWidth">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.gridLineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.color">
+								<hc:propertyExpression><![CDATA["#58595B"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.fontSize">
+								<hc:propertyExpression><![CDATA["11px"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.lineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.lineWidth">
+								<hc:propertyExpression><![CDATA[1]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.tickInterval">
+								<hc:propertyExpression><![CDATA[1]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+						</hc:chartSetting>
+						<multiAxisData>
+							<multiAxisDataset>
+								<dataset>
+									<datasetRun subDataset="ShoppingDay" uuid="659d3af3-489c-4123-8c4b-ae7db3639c0b">
+										<datasetParameter name="customerId">
+											<datasetParameterExpression><![CDATA[$F{customer_customer_id}]]></datasetParameterExpression>
+										</datasetParameter>
+									</datasetRun>
+								</dataset>
+							</multiAxisDataset>
+							<dataAxis axis="Rows">
+								<axisLevel name="Level1">
+									<labelExpression><![CDATA["Level1"]]></labelExpression>
+									<axisLevelBucket class="java.lang.Comparable">
+										<bucketExpression><![CDATA[$F{days_week_day}.equals("Monday") ? "\u200B" + "Mo" : $F{days_week_day}.equals("Tuesday") ? "\u200B\u200B" +"Tu" : $F{days_week_day}.equals("Wednesday") ? "\u200B\u200B\u200B" + "We" : $F{days_week_day}.equals("Thursday") ? "\u200B\u200B\u200B\u200B" + "Th" : $F{days_week_day}.equals("Friday") ? "\u200B\u200B\u200B\u200B\u200B" + "Fr" : $F{days_week_day}.equals("Saturday") ?"\u200B\u200B\u200B\u200B\u200B\u200B" + "Sa" : "\u200B\u200B\u200B\u200B\u200B\u200B\u200B" + "Su"]]></bucketExpression>
+									</axisLevelBucket>
+								</axisLevel>
+							</dataAxis>
+							<dataAxis axis="Columns"/>
+							<multiAxisMeasure name="Measure1" class="java.lang.Long" calculation="Sum">
+								<labelExpression><![CDATA["Sales"]]></labelExpression>
+								<valueExpression><![CDATA[$F{count_sales}]]></valueExpression>
+							</multiAxisMeasure>
+						</multiAxisData>
+						<hc:series name="Measure1"/>
+					</hc:chart>
+				</componentElement>
+				<componentElement>
+					<reportElement x="313" y="205" width="288" height="92" uuid="05e92a34-606f-496c-a376-6e24d26fdf50">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<hc:chart xmlns:hc="http://jaspersoft.com/highcharts" xsi:schemaLocation="http://jaspersoft.com/highcharts http://jaspersoft.com/schema/highcharts.xsd" type="Column">
+						<hc:chartSetting name="default">
+							<hc:chartProperty name="chart.backgroundColor">
+								<hc:propertyExpression><![CDATA[new java.awt.Color(-526344)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderColor">
+								<hc:propertyExpression><![CDATA["#D7DAD9"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderRadius">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.marginBottom">
+								<hc:propertyExpression><![CDATA[20]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.marginTop">
+								<hc:propertyExpression><![CDATA[7]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="colors">
+								<hc:propertyExpression><![CDATA[java.util.Arrays.asList("#0980BA","#004667","#89A54E","#80699B","#3D96AE","#DB843D","#92A8CD","#A47D7C","#B5CA92")]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.enabled">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.href">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.align">
+								<hc:propertyExpression><![CDATA["center"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.borderRadius">
+								<hc:propertyExpression><![CDATA[new Integer(0)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.borderWidth">
+								<hc:propertyExpression><![CDATA[new Integer(0)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.enabled">
+								<hc:propertyExpression><![CDATA[Boolean.TRUE]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.floating">
+								<hc:propertyExpression><![CDATA[Boolean.TRUE]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.itemStyle.color">
+								<hc:propertyExpression><![CDATA["#58595B"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.itemStyle.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.itemStyle.fontSize">
+								<hc:propertyExpression><![CDATA[12]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.margin">
+								<hc:propertyExpression><![CDATA[new Integer(0)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.padding">
+								<hc:propertyExpression><![CDATA[new Integer(5)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.symbolWidth">
+								<hc:propertyExpression><![CDATA[new Integer(10)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.verticalAlign">
+								<hc:propertyExpression><![CDATA["bottom"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.witdh">
+								<hc:propertyExpression><![CDATA[new Integer(100)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.x">
+								<hc:propertyExpression><![CDATA[new Integer(0)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.y">
+								<hc:propertyExpression><![CDATA[new Integer(13)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.column.borderWidth">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.column.shadow">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.series.lineWidth">
+								<hc:propertyExpression><![CDATA[new Integer(2)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="subtitle.floating">
+								<hc:propertyExpression><![CDATA[Boolean.TRUE]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="subtitle.style.fontSize">
+								<hc:propertyExpression><![CDATA["14px"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.align">
+								<hc:propertyExpression><![CDATA["left"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.style.color">
+								<hc:propertyExpression><![CDATA[new java.awt.Color(-10987173)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.style.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.style.fontWeight">
+								<hc:propertyExpression><![CDATA["bold"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.y">
+								<hc:propertyExpression><![CDATA[new Integer(10)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.labels.enabled">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.labels.style.color">
+								<hc:propertyExpression><![CDATA["#58595B"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.lineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="xAxis.tickWidth">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.gridLineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.color">
+								<hc:propertyExpression><![CDATA["#58595B"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.labels.style.fontSize">
+								<hc:propertyExpression><![CDATA["11px"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.lineColor">
+								<hc:propertyExpression><![CDATA["#58595b"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.lineWidth">
+								<hc:propertyExpression><![CDATA[1]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.tickInterval">
+								<hc:propertyExpression><![CDATA[10]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+						</hc:chartSetting>
+						<multiAxisData>
+							<multiAxisDataset>
+								<dataset>
+									<datasetRun subDataset="AvgSale" uuid="cd91b1b5-a10b-4954-8a0a-053678552353">
+										<datasetParameter name="custID">
+											<datasetParameterExpression><![CDATA[$F{customer_customer_id}]]></datasetParameterExpression>
+										</datasetParameter>
+									</datasetRun>
+								</dataset>
+							</multiAxisDataset>
+							<dataAxis axis="Rows">
+								<axisLevel name="Level1">
+									<labelExpression><![CDATA["Level1"]]></labelExpression>
+									<axisLevelBucket class="java.lang.Comparable">
+										<bucketExpression><![CDATA["Average Sales"]]></bucketExpression>
+									</axisLevelBucket>
+								</axisLevel>
+							</dataAxis>
+							<dataAxis axis="Columns">
+								<axisLevel name="Series">
+									<labelExpression><![CDATA["Series"]]></labelExpression>
+									<axisLevelBucket class="java.lang.Comparable">
+										<bucketExpression><![CDATA[$F{customers}]]></bucketExpression>
+									</axisLevelBucket>
+								</axisLevel>
+							</dataAxis>
+							<multiAxisMeasure name="All" class="java.math.BigDecimal" calculation="Sum">
+								<labelExpression><![CDATA[""]]></labelExpression>
+								<valueExpression><![CDATA[$F{avg_all}.setScale( 2, BigDecimal.ROUND_HALF_UP )]]></valueExpression>
+							</multiAxisMeasure>
+						</multiAxisData>
+						<hc:series name="A"/>
+						<hc:series name="Al"/>
+						<hc:series name="Customer"/>
+						<hc:series name="All"/>
+					</hc:chart>
+				</componentElement>
+				<textField>
+					<reportElement key="" style="h2" mode="Opaque" x="612" y="10" width="363" height="25" backcolor="#E9E9E8" uuid="58906f12-0a8c-4de5-8e27-e1720555f54b">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<box leftPadding="10">
+						<topPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{BrandPreferences}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement x="613" y="57" width="362" height="242" uuid="f52c851a-32b4-4639-b1a6-6aebba49e524">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<hc:chart xmlns:hc="http://jaspersoft.com/highcharts" xsi:schemaLocation="http://jaspersoft.com/highcharts http://jaspersoft.com/schema/highcharts.xsd" type="Pie">
+						<hc:chartSetting name="default">
+							<hc:chartProperty name="chart.backgroundColor">
+								<hc:propertyExpression><![CDATA[new java.awt.Color(-526344)]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderColor">
+								<hc:propertyExpression><![CDATA["#D7DAD9"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="chart.borderRadius">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="colors">
+								<hc:propertyExpression><![CDATA[java.util.Arrays.asList("#24607C","#004667","#3B708A","#57859B","#00253F","#001830","#92A8CD","#A47D7C","#B5CA92")]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.enabled">
+								<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.href">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="credits.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="legend.enabled">
+								<hc:propertyExpression><![CDATA[Boolean.FALSE]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.borderWidth">
+								<hc:propertyExpression><![CDATA[0]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.dataLabels.color">
+								<hc:propertyExpression><![CDATA["#ffffff"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.dataLabels.distance">
+								<hc:propertyExpression><![CDATA[-30]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.dataLabels.style.fontFamily">
+								<hc:propertyExpression><![CDATA["Calibri"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.dataLabels.style.fontSize">
+								<hc:propertyExpression><![CDATA["11px"]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.pie.showInLegend" value="true"/>
+							<hc:chartProperty name="plotOptions.pie.size">
+								<hc:propertyExpression><![CDATA[200]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="yAxis.title.text">
+								<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+							</hc:chartProperty>
+							<hc:chartProperty name="plotOptions.series.allowPointSelect">
+								<hc:propertyExpression><![CDATA[Boolean.TRUE]]></hc:propertyExpression>
+							</hc:chartProperty>
+						</hc:chartSetting>
+						<multiAxisData>
+							<multiAxisDataset>
+								<dataset>
+									<datasetRun subDataset="BrandPreferences" uuid="3b4da372-9ec8-40ee-b7a6-7aec63da7ae2">
+										<datasetParameter name="custID">
+											<datasetParameterExpression><![CDATA[$F{customer_customer_id}]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="REPORT_MAX_COUNT">
+											<datasetParameterExpression><![CDATA[new Integer(6)]]></datasetParameterExpression>
+										</datasetParameter>
+									</datasetRun>
+								</dataset>
+							</multiAxisDataset>
+							<dataAxis axis="Rows">
+								<axisLevel name="Brand">
+									<labelExpression><![CDATA["Level Label expression"]]></labelExpression>
+									<axisLevelBucket class="java.lang.String">
+										<bucketExpression><![CDATA[$F{product_brand_name}]]></bucketExpression>
+									</axisLevelBucket>
+								</axisLevel>
+							</dataAxis>
+							<multiAxisMeasure name="Measure1" class="java.lang.Integer" calculation="Sum">
+								<labelExpression><![CDATA["Unit Sales"]]></labelExpression>
+								<valueExpression><![CDATA[$F{unit_sales}]]></valueExpression>
+							</multiAxisMeasure>
+						</multiAxisData>
+						<hc:series name="Measure1"/>
+					</hc:chart>
+				</componentElement>
+				<textField>
+					<reportElement key="" style="h2" mode="Opaque" x="312" y="10" width="289" height="25" backcolor="#E9E9E8" uuid="36d3db37-3ea9-432f-aaa5-a85e5dad0600">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<box leftPadding="10">
+						<topPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{ShoppingDays}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement key="" style="h2" mode="Opaque" x="312" y="161" width="289" height="22" backcolor="#E9E9E8" uuid="45f9810e-e10e-4a7f-b5d8-45a804a4f8c3">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+					</reportElement>
+					<box leftPadding="10">
+						<topPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<leftPen lineWidth="0.0" lineColor="#D7DAD9"/>
+						<bottomPen lineWidth="1.0" lineColor="#D7DAD9"/>
+						<rightPen lineWidth="0.0" lineColor="#D7DAD9"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$R{AverageSale}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<title>
+		<band/>
+	</title>
+	<pageHeader>
+		<band height="84">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="1000" height="84" uuid="8fd11477-64a3-4431-91c1-40c618f2081c">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<image scaleImage="RetainShape" hAlign="Right" vAlign="Top">
+					<reportElement key="barcode-1" mode="Opaque" x="642" y="15" width="346" height="54" forecolor="#000000" backcolor="#FFFFFF" uuid="c8385574-2055-4022-b016-34dae6a2a44e">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<graphicElement fill="Solid">
+						<pen lineWidth="0.0" lineStyle="Solid"/>
+					</graphicElement>
+					<imageExpression><![CDATA[it.businesslogic.ireport.barcode.BcImage.getBarcodeImage(14,$F{customer_account_num},false,false,null,0,0)]]></imageExpression>
+					<hyperlinkTooltipExpression><![CDATA["Barcode"]]></hyperlinkTooltipExpression>
+				</image>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" x="12" y="42" width="320" height="18" forecolor="#58595B" uuid="4b9bc7e7-b0b7-496f-93d4-3a845967337a">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{customer_city} + ", " + $F{customer_state_province} + " " + $F{customer_postal_code}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" x="12" y="60" width="320" height="18" forecolor="#58595B" uuid="fb7af90c-74c5-4045-af93-d76867ca84f0">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+					</box>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{customer_country}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" x="12" y="6" width="320" height="18" forecolor="#004667" uuid="acf3a39e-149b-4748-a166-d2dafd998d49">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+					</box>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{customer_fullname}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField" x="12" y="24" width="320" height="18" forecolor="#58595B" uuid="da8e385c-fce5-4ca1-9fd8-d3c3e50bc942">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+					</box>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{customer_address1}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-4" style="defaultStyle" x="642" y="69" width="346" height="15" forecolor="#333333" uuid="e65538e4-b300-4ce0-b2b0-6b604a0954f5">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="6" rightPadding="6">
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[msg($R{CustomerCardNumber}, $F{customer_account_num}.toString())]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="19">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement mode="Opaque" x="12" y="0" width="976" height="10" backcolor="#F7F7F8" uuid="33f08171-e588-4b3d-8d19-3dee88827445">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<subreport isUsingCache="true" runToBottom="false">
+					<reportElement key="subreport-1" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="809" height="10" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="96df9089-d6a0-4616-b7dc-a3e573f0fe43">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<subreportParameter name="customerId">
+						<subreportParameterExpression><![CDATA[$F{customer_customer_id}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression><![CDATA["repo:CustomerPurchasesReport.jrxml"]]></subreportExpression>
+				</subreport>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+</jasperReport>
