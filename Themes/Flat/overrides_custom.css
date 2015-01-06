@@ -1,0 +1,54 @@
+body {
+	font-family: "Open Sans", Arial, sans-serif;
+}
+
+#frame {
+	top: 26px;
+}
+
+.column.decorated {
+	margin: 0;	
+	border: none;
+}
+
+.banner, #frameFooter {
+	border: none;
+	background: none;
+}
+
+#frameFooter {
+	color: white;
+	padding: 0;
+}
+
+#about, #copyright {
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.button {
+	font-weight: normal;
+}
+
+#banner .wrap.button {
+	font-weight: 700;
+}
+
+
+/* Report Viewer */
+
+#reportViewer #reportViewFrame > .content > .header {
+	background: #eee;
+	padding: 0.5ex 0;
+	border-bottom: 1px solid #c5c5c5;
+}
+
+#viewerToolbar {
+	background: #eee;
+	border: none;
+	height: 32px;
+}
+
+#reportViewFrame .body {
+	top: 40px;
+}
