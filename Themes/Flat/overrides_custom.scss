@@ -1,0 +1,245 @@
+@import "bourbon/bourbon";
+
+/* Common */
+@mixin headerGradient {
+	@include linear-gradient(to bottom, #fff, #eee);
+}
+@mixin subheaderGradient {
+	@include linear-gradient(to bottom, #eee, #d8d8d8);
+}
+
+@mixin darkHeader {
+	@include linear-gradient(to bottom, #777, #666);
+	border: none;
+}
+
+/* Colors */
+
+$defaultBlue: hsl(198, 91%, 43%); /* #0a95d1 */
+$defaultBlueDarker:  hsl(198, 91%, 35%); /* previously #0479ac */
+$defaultBlueLighter: hsl(198, 91%, 50%); /* previously #32a4d5 */
+
+$marsala: hsl(1, 30%, 45%); /* "Marsala" - Pantone Color of the Year 2015 */
+$marsalaDarker: hsl(1, 30%, 40%);
+$marsalaLighter: hsl(1, 30%, 50%);
+
+$color-default: $defaultBlue;
+/*$color-default: $marsala;*/
+$color-default-darker:  darken($color-default, 10); 
+$color-default-lighter: lighten($color-default, 10);
+
+$color-border: #c5c5c5;
+$orange: #ffac0b;
+
+/*@mixin color-default-gradient {
+	@include linear-gradient(to bottom, $marsala, */
+
+/* Font */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,700);
+@import url(http://fonts.googleapis.com/css?family=Noto+Sans:400,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+
+body, .body {
+	font-family: "Noto Sans", Arial, sans-serif;
+}
+
+/*@import url(http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
+.collapsible > li {
+	> .wrap > .icon {
+		background: none;
+		width: 10px;
+	}
+
+	&.node.closed > .wrap > .icon {
+		&:before {
+			font-family: FontAwesome;
+			content: "\f07b";
+			color: $color-default;
+		}
+	}
+
+	&.node.open > .wrap > .icon {
+		&:before {
+			font-family: FontAwesome;
+			content: "\f07c";
+			color: $color-default;
+		}
+	}
+} */
+
+/* Background */
+body {
+	background: $color-default;
+}
+
+/* Login page */
+#loginPage {
+	#copy, #loginForm {
+		border: none;
+	}
+}
+
+
+/* Jasperadmin home page */
+
+#frame {
+	top: 26px;
+	bottom: 16px;
+}
+
+.column.decorated {
+	margin: 0;	
+	border: none;
+}
+
+#banner {
+	@include linear-gradient(to bottom, $color-default-lighter, $color-default);
+
+	border: none;
+}
+
+#frameFooter {
+	@include linear-gradient(to bottom, $color-default, $color-default-darker);
+
+	border: none;
+	color: white;
+	padding: 0;
+}
+
+#about, #copyright {
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.button {
+	/*font-weight: normal;*/
+}
+
+#banner .wrap.button {
+	font-weight: 700;
+}
+
+
+/* Library */
+
+.column.decorated > .content {
+	
+	> .header {
+		@include headerGradient();
+
+		border: none;
+	}
+
+	> .subheader {
+		border: none;
+		
+		> .toolbar {
+			@include subheaderGradient();
+		}
+	}
+}
+
+#resultsListHeader {
+	@include darkHeader();
+
+	> li > .wrap {
+		border: none;
+	}
+
+	h3, p, div {
+		color: $orange;
+		border: none;
+	}
+}
+
+#repoBrowse .column.primary>.content>.body {
+	margin-top: 26px;
+}
+	
+#resultsList {
+	.column, .column > p, .column > .separator {
+		border: none;
+	}
+}
+
+/* Report Viewer */
+
+#reportViewer #reportViewFrame > .content > .header {
+	@include headerGradient();
+
+	padding: 0.5ex 0;
+	border-bottom: 1px solid $color-border;
+}
+
+.toolbar {
+	background: none;
+	border: none;
+	height: 32px;
+}
+
+#reportViewFrame .body {
+	top: 40px;
+}
+
+
+/* Ad hoc */
+
+#adhocToolbar {
+	border-bottom: 1px solid $color-border;
+}
+
+#designer {
+	#filters {
+		#level-container > .pod-header {
+			@include darkHeader();
+			color: $orange;
+		}
+
+		> .content > .header {
+			/*border-bottom: 1px solid $color-border;*/
+		}
+		
+		#expression-container .header {
+			@include darkHeader();
+
+			.filterName {
+				color: $orange;
+			}
+		}
+	}
+
+	#availableFields {
+		.dimension .header {
+			@include darkHeader();
+		}
+
+		.measure .header {
+			@include darkHeader();
+		}
+
+		.header > .title {
+			color: $orange;
+		}
+	}
+
+	#displayManagerPanel .measure {
+		@include darkHeader();
+
+		.member {
+			background: $orange;
+		}
+	}
+}
+
+
+/* Dashboard Designer */
+#dashboard {
+	#display .toolbar {
+		@include subheaderGradient();
+	}
+
+	.dashboardSidebar > .content > .body .header {
+		border: none;
+	}
+}
