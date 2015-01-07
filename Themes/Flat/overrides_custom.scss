@@ -243,3 +243,27 @@ body {
 		border: none;
 	}
 }
+
+
+/* Domain Designer */
+body[id^=domainDesigner_] {
+	> #frame #display .column.decorated.tabbed .content > .header > .tabs {
+		@include subheaderGradient();
+
+		> .tabSet.horizontal.buttons {
+			background: none;
+
+			.tab {
+				margin: 1px 0 0 0;
+
+				.button {
+					margin-bottom: 0;
+					
+					&.over {
+						border: 1px solid transparent;
+					}
+				}
+			}
+		}
+	}
+}

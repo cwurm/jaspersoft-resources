@@ -172,4 +172,18 @@ body {
 #dashboard .dashboardSidebar > .content > .body .header {
   border: none; }
 
+/* Domain Designer */
+body[id^=domainDesigner_] > #frame #display .column.decorated.tabbed .content > .header > .tabs {
+  background-color: #eee;
+  background-image: -webkit-linear-gradient(top, #eee, #d8d8d8);
+  background-image: linear-gradient(to bottom,#eee, #d8d8d8); }
+  body[id^=domainDesigner_] > #frame #display .column.decorated.tabbed .content > .header > .tabs > .tabSet.horizontal.buttons {
+    background: none; }
+    body[id^=domainDesigner_] > #frame #display .column.decorated.tabbed .content > .header > .tabs > .tabSet.horizontal.buttons .tab {
+      margin: 1px 0 0 0; }
+      body[id^=domainDesigner_] > #frame #display .column.decorated.tabbed .content > .header > .tabs > .tabSet.horizontal.buttons .tab .button {
+        margin-bottom: 0; }
+        body[id^=domainDesigner_] > #frame #display .column.decorated.tabbed .content > .header > .tabs > .tabSet.horizontal.buttons .tab .button.over {
+          border: 1px solid transparent; }
+
 /*# sourceMappingURL=overrides_custom.css.map */
