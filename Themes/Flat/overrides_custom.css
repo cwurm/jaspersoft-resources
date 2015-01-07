@@ -1,54 +1,175 @@
-body {
-	font-family: "Open Sans", Arial, sans-serif;
-}
+/* Common */
+/* Colors */
+/* #0a95d1 */
+/* previously #0479ac */
+/* previously #32a4d5 */
+/* "Marsala" - Pantone Color of the Year 2015 */
+/*$color-default: $marsala;*/
+/*@mixin color-default-gradient {
+	@include linear-gradient(to bottom, $marsala, */
+/* Font */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,700);
+@import url(http://fonts.googleapis.com/css?family=Noto+Sans:400,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700);
+body, .body {
+  font-family: "Noto Sans", Arial, sans-serif; }
 
+/*@import url(http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
+.collapsible > li {
+	> .wrap > .icon {
+		background: none;
+		width: 10px;
+	}
+
+	&.node.closed > .wrap > .icon {
+		&:before {
+			font-family: FontAwesome;
+			content: "\f07b";
+			color: $color-default;
+		}
+	}
+
+	&.node.open > .wrap > .icon {
+		&:before {
+			font-family: FontAwesome;
+			content: "\f07c";
+			color: $color-default;
+		}
+	}
+} */
+/* Background */
+body {
+  background: #0a96d1; }
+
+/* Login page */
+#loginPage #copy, #loginPage #loginForm {
+  border: none; }
+
+/* Jasperadmin home page */
 #frame {
-	top: 26px;
-}
+  top: 26px;
+  bottom: 16px; }
 
 .column.decorated {
-	margin: 0;	
-	border: none;
-}
+  margin: 0;
+  border: none; }
 
-.banner, #frameFooter {
-	border: none;
-	background: none;
-}
+#banner {
+  background-color: #1ab3f4;
+  background-image: -webkit-linear-gradient(top, #1ab3f4, #0a96d1);
+  background-image: linear-gradient(to bottom,#1ab3f4, #0a96d1);
+  border: none; }
 
 #frameFooter {
-	color: white;
-	padding: 0;
-}
+  background-color: #0a96d1;
+  background-image: -webkit-linear-gradient(top, #0a96d1, #0873a1);
+  background-image: linear-gradient(to bottom,#0a96d1, #0873a1);
+  border: none;
+  color: white;
+  padding: 0; }
 
 #about, #copyright {
-	font-weight: normal;
-	font-size: 1em;
-}
+  font-weight: normal;
+  font-size: 1em; }
 
 .button {
-	font-weight: normal;
-}
+  /*font-weight: normal;*/ }
 
 #banner .wrap.button {
-	font-weight: 700;
-}
+  font-weight: 700; }
 
+/* Library */
+.column.decorated > .content > .header {
+  background-color: #fff;
+  background-image: -webkit-linear-gradient(top, #fff, #eee);
+  background-image: linear-gradient(to bottom,#fff, #eee);
+  border: none; }
+.column.decorated > .content > .subheader {
+  border: none; }
+  .column.decorated > .content > .subheader > .toolbar {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #d8d8d8);
+    background-image: linear-gradient(to bottom,#eee, #d8d8d8); }
+
+#resultsListHeader {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none; }
+  #resultsListHeader > li > .wrap {
+    border: none; }
+  #resultsListHeader h3, #resultsListHeader p, #resultsListHeader div {
+    color: #ffac0b;
+    border: none; }
+
+#repoBrowse .column.primary > .content > .body {
+  margin-top: 26px; }
+
+#resultsList .column, #resultsList .column > p, #resultsList .column > .separator {
+  border: none; }
 
 /* Report Viewer */
-
 #reportViewer #reportViewFrame > .content > .header {
-	background: #eee;
-	padding: 0.5ex 0;
-	border-bottom: 1px solid #c5c5c5;
-}
+  background-color: #fff;
+  background-image: -webkit-linear-gradient(top, #fff, #eee);
+  background-image: linear-gradient(to bottom,#fff, #eee);
+  padding: 0.5ex 0;
+  border-bottom: 1px solid #c5c5c5; }
 
-#viewerToolbar {
-	background: #eee;
-	border: none;
-	height: 32px;
-}
+.toolbar {
+  background: none;
+  border: none;
+  height: 32px; }
 
 #reportViewFrame .body {
-	top: 40px;
-}
+  top: 40px; }
+
+/* Ad hoc */
+#adhocToolbar {
+  border-bottom: 1px solid #c5c5c5; }
+
+#designer #filters #level-container > .pod-header {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none;
+  color: #ffac0b; }
+#designer #filters > .content > .header {
+  /*border-bottom: 1px solid $color-border;*/ }
+#designer #filters #expression-container .header {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none; }
+  #designer #filters #expression-container .header .filterName {
+    color: #ffac0b; }
+#designer #availableFields .dimension .header {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none; }
+#designer #availableFields .measure .header {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none; }
+#designer #availableFields .header > .title {
+  color: #ffac0b; }
+#designer #displayManagerPanel .measure {
+  background-color: #777;
+  background-image: -webkit-linear-gradient(top, #777, #666);
+  background-image: linear-gradient(to bottom,#777, #666);
+  border: none; }
+  #designer #displayManagerPanel .measure .member {
+    background: #ffac0b; }
+
+/* Dashboard Designer */
+#dashboard #display .toolbar {
+  background-color: #eee;
+  background-image: -webkit-linear-gradient(top, #eee, #d8d8d8);
+  background-image: linear-gradient(to bottom,#eee, #d8d8d8); }
+#dashboard .dashboardSidebar > .content > .body .header {
+  border: none; }
+
+/*# sourceMappingURL=overrides_custom.css.map */

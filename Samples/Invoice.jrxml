@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-05T20:10:45 -->
+<!-- 2015-01-06T16:51:19 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="77f62705-562e-4973-b813-d2af08ae2a10">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
@@ -146,7 +146,7 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 			<staticText>
 				<reportElement x="0" y="0" width="250" height="44" forecolor="#000000" uuid="55f41ce2-7df0-421a-9471-ea284679e6e0"/>
 				<textElement>
-					<font fontName="Silom" size="33" isBold="true"/>
+					<font fontName="Silom" size="33" isBold="true" pdfFontName="" pdfEncoding=""/>
 				</textElement>
 				<text><![CDATA[FOODMART]]></text>
 			</staticText>
