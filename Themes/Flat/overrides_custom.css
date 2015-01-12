@@ -169,6 +169,12 @@ body {
   background-color: #eee;
   background-image: -webkit-linear-gradient(top, #eee, #d8d8d8);
   background-image: linear-gradient(to bottom,#eee, #d8d8d8); }
+#dashboard #display .dashletContent {
+  border: none;
+  box-shadow: 0 0 1px 0 #bbb; }
+  #dashboard #display .dashletContent > .content {
+    /* To offset padding: 1px added inline by JRS */
+    padding: 0 !important; }
 #dashboard .dashboardSidebar > .content > .body .header {
   border: none; }
 

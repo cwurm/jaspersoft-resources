@@ -30,6 +30,7 @@ $color-default-lighter: lighten($color-default, 10);
 
 $color-border: #c5c5c5;
 $orange: #ffac0b;
+$darkGrey: #bbb;
 
 /*@mixin color-default-gradient {
 	@include linear-gradient(to bottom, $marsala, */
@@ -235,8 +236,20 @@ body {
 
 /* Dashboard Designer */
 #dashboard {
-	#display .toolbar {
-		@include subheaderGradient();
+	#display {
+		.toolbar {
+			@include subheaderGradient();
+		}
+
+		.dashletContent {
+			border: none;
+			box-shadow: 0 0 1px 0 $darkGrey; 
+
+			> .content {
+				/* To offset padding: 1px added inline by JRS */
+				padding: 0 !important;
+			}
+		}
 	}
 
 	.dashboardSidebar > .content > .body .header {
