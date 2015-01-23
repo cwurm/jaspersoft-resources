@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-06T16:51:19 -->
+<!-- 2015-01-14T16:16:30 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="77f62705-562e-4973-b813-d2af08ae2a10">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+	<property name="ireport.jasperserver.url" value="http://127.0.0.1:8080/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/Christoph/Invoice_files/Invoice_"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Invoice"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -142,18 +146,30 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<title>
-		<band height="44" splitType="Stretch">
+		<band height="85" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="250" height="44" forecolor="#000000" uuid="55f41ce2-7df0-421a-9471-ea284679e6e0"/>
+				<reportElement x="0" y="0" width="250" height="44" forecolor="#0082CC" uuid="55f41ce2-7df0-421a-9471-ea284679e6e0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
 				<textElement>
-					<font fontName="Silom" size="33" isBold="true" pdfFontName="" pdfEncoding=""/>
+					<font size="33" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FOODMART]]></text>
+			</staticText>
+			<image>
+				<reportElement x="495" y="0" width="50" height="50" uuid="e75e55e2-be1e-4335-9aca-b18445b3db28"/>
+				<imageExpression><![CDATA["tibco.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="Text" x="0" y="44" width="100" height="30" uuid="fbcd4fb8-995b-4c9b-9ce2-965fcdc5ba2b"/>
+				<text><![CDATA[FOODMART INC.
+1 Foodmart Avenue
+6141 Foodmart]]></text>
 			</staticText>
 		</band>
 	</title>
 	<summary>
-		<band height="280" splitType="Stretch">
+		<band height="455" splitType="Stretch">
 			<textField>
 				<reportElement x="410" y="10" width="144" height="20" uuid="560fa78b-e692-40b5-a3fa-8067d06912d2"/>
 				<textElement textAlignment="Left">
@@ -491,6 +507,15 @@ WHERE sales.customer_id = $P{CUSTOMER_ID} AND sales.time_id = $P{TIME_ID}]]>
 + $F{store_phone} + "\n"
 + $F{store_fax} + "\n"
 + "Manager: " + $F{store_manager}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Text" positionType="Float" x="0" y="320" width="380" height="120" uuid="8ab1c59e-8482-4997-b8ab-c703021a509b"/>
+				<textFieldExpression><![CDATA["Thank you for your order. The above amount will be debited to your account.\n" +
+"For our Terms and Conditions (T&C) please visit our website http://www.jaspersoft.com\n" +
+"If you have any questions regarding this invoice or the delivery of the goods please contact us:\n" +
+"Phone: 0100-1900234 (Mo-Fr 8-16)\n" +
+"Fax: 0100-1900299\n" +
+"Web: http://www.jaspersoft.com"]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

@@ -26,4 +26,16 @@
 		<nature>net.sf.jasperreports.nature</nature>
 		<nature>com.jaspersoft.studio.babel.editor.rbeNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>JasperReportsServerPro-1420558838866</name>
+			<type>2</type>
+			<location>/private/var/folders/qf/62j74ckj7rsg6jpct52m0jcc0000gn/T/JasperReportsServerPro-1420558838866</location>
+		</link>
+		<link>
+			<name>JasperReportsServerPro-1421947280267</name>
+			<type>2</type>
+			<location>/private/var/folders/qf/62j74ckj7rsg6jpct52m0jcc0000gn/T/JasperReportsServerPro-1421947280267</location>
+		</link>
+	</linkedResources>
 </projectDescription>

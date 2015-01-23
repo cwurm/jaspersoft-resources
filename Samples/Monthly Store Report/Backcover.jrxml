@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
+<!-- 2015-01-23T17:37:50 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Wave Backcover" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c50b24eb-eb33-413f-8e75-e7e20a5341fd">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="ireport.jasperserver.url" value="http://127.0.0.1:8080/jasperserver-pro/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/public/Christoph/Wave_Book_files/Wave_Book_backcover.jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Wave_Book"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<title>
+		<band height="841" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="595" height="841" backcolor="#668238" uuid="a0eeb945-c461-469c-9539-05d63cee5db1"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<image>
+				<reportElement x="128" y="314" width="338" height="212" uuid="8ba92eaf-6789-4770-9c36-118c9c7e74f3"/>
+				<imageExpression><![CDATA["acme_foods_logo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="167" y="810" width="260" height="24" forecolor="#FFFFFF" uuid="710cb49a-3631-4f07-b70a-163e66521580"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[© Copyright 2000-2015 TIBCO Software Inc.]]></text>
+			</staticText>
+		</band>
+	</title>
+</jasperReport>
