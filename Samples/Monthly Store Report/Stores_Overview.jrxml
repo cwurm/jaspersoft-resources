@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
+<!-- 2015-01-23T23:54:18 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Stores_Overview" pageWidth="842" pageHeight="1190" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74add766-e4e9-412d-ae88-6a15ebd95ad0">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Crosstab_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" forecolor="#FFFFFF" backcolor="#668238">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Column_Header_Label" forecolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontSize="16">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell" vAlign="Middle">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell_Conditional" style="Column_Cell">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{store_sales_1998}.doubleValue() > $F{store_sales_1997}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#668238"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{store_sales_1998}.doubleValue() <= $F{store_sales_1997}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#8D443D"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="Extended Sales" uuid="4962fc95-b7e3-44b2-9970-ee8c42f3bbcb">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+		<parameter name="THE_MONTH" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+	store_name,
+	store_sales_1998,
+	store_sales_1997
+FROM
+	(SELECT
+		store_id,
+		sum(store_sales) AS store_sales_1998
+	FROM sales_fact_1998
+	JOIN time_by_day ON sales_fact_1998.time_id = time_by_day.time_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id) AS sales_1998
+FULL OUTER JOIN
+	(SELECT
+		store_id,
+		sum(store_sales) AS store_sales_1997
+	FROM sales_fact_1997
+	JOIN time_by_day ON sales_fact_1997.time_id = time_by_day.time_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id) AS sales_1997
+	ON sales_1998.store_id = sales_1997.store_id
+LEFT JOIN store ON sales_1998.store_id = store.store_id]]>
+		</queryString>
+		<field name="store_sales_1998" class="java.math.BigDecimal"/>
+		<field name="store_sales_1997" class="java.math.BigDecimal"/>
+		<field name="store_name" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="THE_MONTH" class="java.lang.String">
+		<defaultValueExpression><![CDATA["January"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	sales.store_id,
+	store_name,
+	product_category,
+	store_sales
+FROM
+	sales_fact_1998 sales
+JOIN
+	time_by_day time ON sales.time_id = time.time_id
+LEFT JOIN
+	store ON sales.store_id = store.store_id
+LEFT JOIN
+	product ON sales.product_id = product.product_id
+LEFT JOIN
+	product_class pc ON product.product_class_id = pc.product_class_id
+WHERE
+	time.the_month = $P{THE_MONTH} AND
+	pc.product_class_id IN (
+			SELECT product_class_id FROM product p LEFT JOIN sales_fact_1998 s ON p.product_id = s.product_id
+			GROUP BY product_class_id ORDER BY sum(store_sales) LIMIT 30
+	)]]>
+	</queryString>
+	<field name="store_name" class="java.lang.String"/>
+	<field name="store_sales" class="java.math.BigDecimal"/>
+	<field name="store_id" class="java.lang.Integer"/>
+	<field name="product_category" class="java.lang.String"/>
+	<pageHeader>
+		<band height="40">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="800" height="40" backcolor="#668238" uuid="4dc2d776-ece7-484c-80a6-53fc4d388393">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</frame>
+			<staticText>
+				<reportElement x="0" y="0" width="800" height="40" forecolor="#FFFFFF" uuid="60e8ab5c-ace3-47c2-b614-a8489f9ba74b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="33"/>
+				</textElement>
+				<text><![CDATA[Store Sales by Product Category]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="820" splitType="Immediate">
+			<componentElement>
+				<reportElement x="0" y="0" width="802" height="510" uuid="33a48d21-6160-43ee-8a32-cdea4aaeec06">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<hc:chart xmlns:hc="http://jaspersoft.com/highcharts" xsi:schemaLocation="http://jaspersoft.com/highcharts http://jaspersoft.com/schema/highcharts.xsd" type="HeatMap">
+					<hc:chartSetting name="default">
+						<hc:chartProperty name="chart.zoomType">
+							<hc:propertyExpression><![CDATA["xy"]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="colorAxis.maxColor" value="&quot;#668238&quot;"/>
+						<hc:chartProperty name="colorAxis.min" value="0"/>
+						<hc:chartProperty name="colorAxis.minColor" value="&quot;#E8F0DB&quot;"/>
+						<hc:chartProperty name="colors">
+							<hc:propertyExpression><![CDATA[java.util.Arrays.asList("#2f7ed8","#0d233a","#8bbc21","#910000","#1aadce","#492970","#f28f43","#77a1e5","#c42525","#a6c96a")]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="credits.enabled">
+							<hc:propertyExpression><![CDATA[false]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="credits.href">
+							<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="credits.text">
+							<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="legend.enabled">
+							<hc:propertyExpression><![CDATA[Boolean.FALSE]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="plotOptions.series.color">
+							<hc:propertyExpression><![CDATA[new java.awt.Color(-10059208)]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="plotOptions.series.cropThreshold">
+							<hc:propertyExpression><![CDATA[new Integer(300)]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="title.text">
+							<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="xAxis.labels.rotation">
+							<hc:propertyExpression><![CDATA[new Integer(-45)]]></hc:propertyExpression>
+						</hc:chartProperty>
+						<hc:chartProperty name="yAxis.title.text">
+							<hc:propertyExpression><![CDATA[""]]></hc:propertyExpression>
+						</hc:chartProperty>
+					</hc:chartSetting>
+					<multiAxisData>
+						<multiAxisDataset/>
+						<dataAxis axis="Rows">
+							<axisLevel name="Product Category">
+								<labelExpression><![CDATA[]]></labelExpression>
+								<axisLevelBucket class="java.lang.String">
+									<bucketExpression><![CDATA[$F{product_category}]]></bucketExpression>
+								</axisLevelBucket>
+							</axisLevel>
+						</dataAxis>
+						<dataAxis axis="Columns">
+							<axisLevel name="Store Name">
+								<labelExpression><![CDATA[]]></labelExpression>
+								<axisLevelBucket class="java.lang.String">
+									<bucketExpression><![CDATA[$F{store_name}]]></bucketExpression>
+								</axisLevelBucket>
+							</axisLevel>
+						</dataAxis>
+						<multiAxisMeasure name="Store Sales" class="java.lang.Integer" calculation="Sum">
+							<labelExpression><![CDATA["Label"]]></labelExpression>
+							<valueExpression><![CDATA[$F{store_sales}.intValue()]]></valueExpression>
+						</multiAxisMeasure>
+					</multiAxisData>
+					<hc:series name="Store Sales"/>
+				</hc:chart>
+			</componentElement>
+			<componentElement>
+				<reportElement x="0" y="540" width="802" height="280" uuid="766055e4-d22a-418a-bbcf-9af1c7461027"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Extended Sales" uuid="ec43545f-9857-4b4d-a575-e11aefbd19ce">
+						<datasetParameter name="THE_MONTH">
+							<datasetParameterExpression><![CDATA[$P{THE_MONTH}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="260" uuid="2204ceac-5c24-4a1a-8130-eb31cea340b9">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="260" height="30" uuid="d91dbe4c-0b7a-48cc-8a2b-f542554a88e2"/>
+								<text><![CDATA[Store]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="260" height="30" uuid="424bf1ce-c5f4-42d0-a5e3-0c87fa0e134d"/>
+								<textFieldExpression><![CDATA[$F{store_name}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="180" uuid="51d4cb2e-df97-4213-8f6c-cab0c864dc17">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="180" height="30" uuid="7c4f6ca7-3379-40fa-b2e4-74d98266bba0"/>
+								<text><![CDATA[Month]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="180" height="30" uuid="f36729fe-6f86-44df-ab90-8de27d00ca73"/>
+								<textFieldExpression><![CDATA[TEXT($F{store_sales_1998}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="200" uuid="eadb7e37-71e8-48c7-be8c-44a893d9d02c">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="200" height="30" uuid="c389c922-e169-4064-8cef-cf29d52e732f"/>
+								<text><![CDATA[Month last year]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="200" height="30" uuid="cbea2b0c-75b7-4846-b5f8-cba36213d198"/>
+								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null, "", TEXT($F{store_sales_1997}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode())]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="162" uuid="4b6879ec-1bdc-4abd-9252-80ff5c7d11aa">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="162" height="30" uuid="cc1fa1e8-5876-42a8-aa98-df8bc819fdf5"/>
+								<text><![CDATA[YOY %]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell_Conditional" x="0" y="0" width="162" height="30" uuid="e4d2b7c0-cdd1-41f4-93c2-1dd97e4765d0"/>
+								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null,"N/A",TEXT($F{store_sales_1998}.subtract($F{store_sales_1997}).divide($F{store_sales_1997}, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)),"+#,##0.00;-#") + " %")]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>
