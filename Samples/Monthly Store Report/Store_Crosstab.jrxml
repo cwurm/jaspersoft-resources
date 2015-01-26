@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
+<!-- 2015-01-26T14:07:12 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Store_Crosstab" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7e196977-678e-4a1f-b82f-f8b7eae325d8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<style name="Crosstab_CH" mode="Opaque" backcolor="#668238">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Crosstab_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Crosstab_CT" mode="Opaque" backcolor="#668238">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Crosstab_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<leftPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Column_Header_Label" forecolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontSize="16">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell" vAlign="Middle">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell_Conditional" style="Column_Cell">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{store_sales_1998_MEASURE1}.doubleValue() > $V{store_sales_1997_MEASURE1}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#668238"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{store_sales_1998_MEASURE1}.doubleValue() <= $V{store_sales_1997_MEASURE1}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#8D443D"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="THE_MONTH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["January"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="STORE_ID" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	sales_1998.product_department,
+	store_sales_1998,
+	store_sales_1997
+FROM
+	(SELECT
+		product_department,
+		store_id,
+		sum(store_sales) AS store_sales_1998
+	FROM sales_fact_1998
+	JOIN time_by_day ON sales_fact_1998.time_id = time_by_day.time_id
+	JOIN product ON sales_fact_1998.product_id = product.product_id
+	JOIN product_class pc ON product.product_class_id = pc.product_class_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id, product_department) AS sales_1998
+FULL OUTER JOIN
+	(SELECT
+		product_department,
+		store_id,
+		sum(store_sales) AS store_sales_1997
+	FROM sales_fact_1997
+	JOIN time_by_day ON sales_fact_1997.time_id = time_by_day.time_id
+	JOIN product ON sales_fact_1997.product_id = product.product_id
+	JOIN product_class pc ON product.product_class_id = pc.product_class_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id, product_department) AS sales_1997
+ON sales_1998.store_id = sales_1997.store_id
+AND sales_1998.product_department = sales_1997.product_department
+LEFT JOIN store ON sales_1998.store_id = store.store_id
+WHERE store.store_id = $P{STORE_ID}]]>
+	</queryString>
+	<field name="product_department" class="java.lang.String"/>
+	<field name="store_sales_1998" class="java.math.BigDecimal"/>
+	<field name="store_sales_1997" class="java.math.BigDecimal"/>
+	<summary>
+		<band height="90" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="0" width="554" height="90" uuid="7a278275-d6c4-421e-a9ec-acf714e48b1c"/>
+				<rowGroup name="store_name1" width="120" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{product_department}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque" style="Crosstab_CH">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<textField>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="120" height="22" uuid="1e810edf-d329-430e-a78f-bc37a41f15e9">
+									<property name="local_mesure_unitheight" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								</reportElement>
+								<textElement>
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{store_name1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents mode="Opaque" style="Crosstab_CT">
+							<property name="local_mesure_unitheight" value="pixel"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="120" height="30" forecolor="#FFFFFF" uuid="fa880a9f-388f-49ec-acf9-8ab31602eb42"/>
+								<text><![CDATA[Total store_name1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="Column Group1" height="30">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA["Sales"]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab_CH">
+							<textField>
+								<reportElement style="Column_Header_Label" x="120" y="0" width="120" height="30" uuid="b9346296-ac56-4dc9-959d-913756e75dd1">
+									<property name="local_mesure_unity" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="local_mesure_unitx" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+									<property name="local_mesure_unitwidth" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA["Month Last Year"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement style="Column_Header_Label" x="240" y="0" width="154" height="30" uuid="abe44a72-ddd2-4c2f-826d-8987d251b676">
+									<property name="local_mesure_unity" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.y" value="px"/>
+									<property name="local_mesure_unitx" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA["YOY %"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement style="Column_Header_Label" mode="Transparent" x="0" y="0" width="120" height="30" forecolor="#FFFFFF" uuid="86bff2bf-299c-4c75-86f5-cbec01b3b11d">
+									<property name="local_mesure_unitwidth" value="pixel"/>
+									<property name="com.jaspersoft.studio.unit.width" value="px"/>
+								</reportElement>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA["Month"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab_CT">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="f7e6ab51-e21e-458d-b692-dfd669b3cb64"/>
+								<text><![CDATA[Total Column Group1]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="store_sales_1998_MEASURE1" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{store_sales_1998}]]></measureExpression>
+				</measure>
+				<measure name="store_sales_1997_MEASURE1" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{store_sales_1997}]]></measureExpression>
+				</measure>
+				<crosstabCell width="394" height="22">
+					<cellContents mode="Opaque" style="Crosstab_CD">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+						<textField>
+							<reportElement style="Column_Cell" x="0" y="0" width="120" height="22" uuid="96a07720-dd91-41f1-a4d0-60b8bcee9ac6">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<textElement textAlignment="Right">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[TEXT($V{store_sales_1998_MEASURE1}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement style="Column_Cell" x="120" y="0" width="120" height="22" uuid="ef340aa3-ffe7-4075-a7c6-8bf703c1a6c3">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<textElement textAlignment="Right">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[TEXT($V{store_sales_1997_MEASURE1}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement style="Column_Cell_Conditional" x="240" y="0" width="153" height="22" uuid="320b8978-b357-42bb-a748-a90ba62bbc28">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<printWhenExpression><![CDATA[NOT($V{store_sales_1997_MEASURE1}.equals(new BigDecimal(0)))]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Right">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[IF($V{store_sales_1997_MEASURE1} == new BigDecimal(0),"N/A",TEXT($V{store_sales_1998_MEASURE1}.subtract($V{store_sales_1997_MEASURE1}).divide($V{store_sales_1997_MEASURE1}.add(new BigDecimal(0.001)), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)),"+#,##0.00;-#") + " %")]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="394" height="30" rowTotalGroup="store_name1">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+						<textField>
+							<reportElement style="Column_Cell" x="0" y="0" width="120" height="30" forecolor="#FFFFFF" uuid="427fd199-fa27-4971-8c20-f351f57ec811">
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<textElement textAlignment="Right"/>
+							<textFieldExpression><![CDATA[TEXT($V{store_sales_1998_MEASURE1}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement style="Column_Cell" x="120" y="0" width="120" height="30" forecolor="#FFFFFF" uuid="26b9efc8-1f89-43fe-a7fe-634c5b71d09a">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							</reportElement>
+							<textElement textAlignment="Right"/>
+							<textFieldExpression><![CDATA[TEXT($V{store_sales_1997_MEASURE1}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement style="Column_Cell_Conditional" x="240" y="0" width="153" height="30" forecolor="#FFFFFF" uuid="c644a3e5-b2a7-4364-a66d-e7a047cd33ae">
+								<property name="com.jaspersoft.studio.unit.x" value="px"/>
+								<printWhenExpression><![CDATA[NOT($V{store_sales_1997_MEASURE1}.equals(new BigDecimal(0)))]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Right"/>
+							<textFieldExpression><![CDATA[IF($V{store_sales_1997_MEASURE1} == new BigDecimal(0),"N/A",TEXT($V{store_sales_1998_MEASURE1}.subtract($V{store_sales_1997_MEASURE1}).divide($V{store_sales_1997_MEASURE1}.add(new BigDecimal(0.001)), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)),"+#,##0.00;-#") + " %")]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

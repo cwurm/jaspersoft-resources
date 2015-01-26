@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
+<!-- 2015-01-26T13:48:45 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Stores_Overview_Crosstab" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4d26a4b8-7cfd-4281-8b5d-bafdfc7ce005">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" forecolor="#FFFFFF" backcolor="#668238">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Column_Header_Label" forecolor="#FFFFFF" hAlign="Left" vAlign="Middle" fontSize="16">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell" vAlign="Middle">
+		<box padding="5"/>
+	</style>
+	<style name="Column_Cell_Conditional" style="Column_Cell">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{store_sales_1998}.doubleValue() > $F{store_sales_1997}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#668238"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{store_sales_1998}.doubleValue() <= $F{store_sales_1997}.doubleValue()]]></conditionExpression>
+			<style mode="Opaque" forecolor="#FFFFFF" backcolor="#8D443D"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="TableSet" uuid="ba9d8d59-23ae-4249-86c2-4f0633303af5">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
+		<parameter name="THE_MONTH" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT
+	store_name,
+	store_sales_1998,
+	store_sales_1997
+FROM
+	(SELECT
+		store_id,
+		sum(store_sales) AS store_sales_1998
+	FROM sales_fact_1998
+	JOIN time_by_day ON sales_fact_1998.time_id = time_by_day.time_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id) AS sales_1998
+FULL OUTER JOIN
+	(SELECT
+		store_id,
+		sum(store_sales) AS store_sales_1997
+	FROM sales_fact_1997
+	JOIN time_by_day ON sales_fact_1997.time_id = time_by_day.time_id
+	WHERE time_by_day.the_month = $P{THE_MONTH}
+	GROUP BY store_id) AS sales_1997
+	ON sales_1998.store_id = sales_1997.store_id
+LEFT JOIN store ON sales_1998.store_id = store.store_id]]>
+		</queryString>
+		<field name="store_name" class="java.lang.String"/>
+		<field name="store_sales_1998" class="java.math.BigDecimal"/>
+		<field name="store_sales_1997" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="THE_MONTH" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["January"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	sales.store_id,
+	store_name,
+	product_category,
+	store_sales
+FROM
+	sales_fact_1998 sales
+JOIN
+	time_by_day time ON sales.time_id = time.time_id
+LEFT JOIN
+	store ON sales.store_id = store.store_id
+LEFT JOIN
+	product ON sales.product_id = product.product_id
+LEFT JOIN
+	product_class pc ON product.product_class_id = pc.product_class_id
+WHERE
+	time.the_month = $P{THE_MONTH} AND
+	pc.product_class_id IN (
+			SELECT product_class_id FROM product p LEFT JOIN sales_fact_1998 s ON p.product_id = s.product_id
+			GROUP BY product_class_id ORDER BY sum(store_sales) LIMIT 30
+	)]]>
+	</queryString>
+	<field name="store_name" class="java.lang.String"/>
+	<field name="store_sales" class="java.math.BigDecimal"/>
+	<field name="store_id" class="java.lang.Integer"/>
+	<field name="product_category" class="java.lang.String"/>
+	<pageHeader>
+		<band height="40">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="800" height="40" backcolor="#668238" uuid="12bca55d-9e18-40ed-aa2e-cc6872bf763c">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</frame>
+			<staticText>
+				<reportElement x="0" y="0" width="800" height="40" forecolor="#FFFFFF" uuid="36638e22-ddcc-4142-9e5f-f538735ef603"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="33"/>
+				</textElement>
+				<text><![CDATA[Store Sales Year-over-Year]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="244" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="10" width="802" height="234" uuid="c90d2330-20ed-4bf7-a5c8-3f80c2e18bf3">
+					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value=""/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="TableSet" uuid="36d6742e-4d28-43f1-b41f-61da9e0f9ee4">
+						<datasetParameter name="THE_MONTH">
+							<datasetParameterExpression><![CDATA[$P{THE_MONTH}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="260" uuid="e4f5d05b-607b-4274-b7d8-75710109ace1">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="260" height="30" uuid="042e36e5-5dbb-407a-8763-2547055880d2"/>
+								<text><![CDATA[Store]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="260" height="30" uuid="b6a045d7-0581-497c-9007-f70b3afeab0c"/>
+								<textFieldExpression><![CDATA[$F{store_name}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="180" uuid="81b45140-2abb-46aa-9978-34314a14bfa0">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="180" height="30" uuid="8920a3f2-bd55-4be8-9778-63ef504db19a"/>
+								<text><![CDATA[Month]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="180" height="30" uuid="96690b0e-3f2a-42cf-9b86-f138f2f1549c"/>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA[TEXT($F{store_sales_1998}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="200" uuid="c1ed9b35-efed-4ea7-8770-2a7987290368">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="200" height="30" uuid="4dedc4fc-efc5-4f2d-bce4-21458d19b666"/>
+								<text><![CDATA[Month last year]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement style="Column_Cell" x="0" y="0" width="200" height="30" uuid="fc96806b-022a-436e-a0cd-5596b56b0c27"/>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null, "", TEXT($F{store_sales_1997}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode())]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="162" uuid="a282f5ec-e640-49ae-9168-eac657ba1e23">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement style="Column_Header_Label" x="0" y="0" width="162" height="30" uuid="49b89697-d941-4e33-a412-918e24189c21"/>
+								<text><![CDATA[YOY %]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isBlankWhenNull="true">
+								<reportElement style="Column_Cell_Conditional" x="0" y="0" width="162" height="30" uuid="c46d6ac1-c945-4247-bf7e-a48a1fd40627"/>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null,"N/A",TEXT($F{store_sales_1998}.subtract($F{store_sales_1997}).divide($F{store_sales_1997}, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)),"+#,##0.00;-#") + " %")]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

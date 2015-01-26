@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
-<!-- 2015-01-23T17:37:33 -->
+<!-- 2015-01-26T12:54:34 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Wave Cover" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c50b24eb-eb33-413f-8e75-e7e20a5341fd">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -60,7 +60,7 @@
 				<textFieldExpression><![CDATA["Printed on " + DATEFORMAT(TODAY( ),"E MMM d, yyyy")]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement mode="Opaque" x="10" y="10" width="320" height="170" backcolor="#668238" uuid="df3db548-6930-4359-b5f8-f99b0885fa51"/>
+				<reportElement mode="Opaque" x="0" y="0" width="320" height="170" backcolor="#668238" uuid="df3db548-6930-4359-b5f8-f99b0885fa51"/>
 				<imageExpression><![CDATA["acme_foods_logo.png"]]></imageExpression>
 			</image>
 		</band>

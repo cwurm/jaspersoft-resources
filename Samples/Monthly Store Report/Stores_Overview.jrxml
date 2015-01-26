@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
-<!-- 2015-01-23T23:54:18 -->
+<!-- 2015-01-26T13:09:21 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Stores_Overview" pageWidth="842" pageHeight="1190" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74add766-e4e9-412d-ae88-6a15ebd95ad0">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -165,7 +165,7 @@ WHERE
 		</band>
 	</pageHeader>
 	<summary>
-		<band height="820" splitType="Immediate">
+		<band height="510" splitType="Immediate">
 			<componentElement>
 				<reportElement x="0" y="0" width="802" height="510" uuid="33a48d21-6160-43ee-8a32-cdea4aaeec06">
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -235,73 +235,6 @@ WHERE
 					</multiAxisData>
 					<hc:series name="Store Sales"/>
 				</hc:chart>
-			</componentElement>
-			<componentElement>
-				<reportElement x="0" y="540" width="802" height="280" uuid="766055e4-d22a-418a-bbcf-9af1c7461027"/>
-				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="Extended Sales" uuid="ec43545f-9857-4b4d-a575-e11aefbd19ce">
-						<datasetParameter name="THE_MONTH">
-							<datasetParameterExpression><![CDATA[$P{THE_MONTH}]]></datasetParameterExpression>
-						</datasetParameter>
-						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-					</datasetRun>
-					<jr:column width="260" uuid="2204ceac-5c24-4a1a-8130-eb31cea340b9">
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement style="Column_Header_Label" x="0" y="0" width="260" height="30" uuid="d91dbe4c-0b7a-48cc-8a2b-f542554a88e2"/>
-								<text><![CDATA[Store]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement style="Column_Cell" x="0" y="0" width="260" height="30" uuid="424bf1ce-c5f4-42d0-a5e3-0c87fa0e134d"/>
-								<textFieldExpression><![CDATA[$F{store_name}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="180" uuid="51d4cb2e-df97-4213-8f6c-cab0c864dc17">
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement style="Column_Header_Label" x="0" y="0" width="180" height="30" uuid="7c4f6ca7-3379-40fa-b2e4-74d98266bba0"/>
-								<text><![CDATA[Month]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement style="Column_Cell" x="0" y="0" width="180" height="30" uuid="f36729fe-6f86-44df-ab90-8de27d00ca73"/>
-								<textFieldExpression><![CDATA[TEXT($F{store_sales_1998}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode()]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="200" uuid="eadb7e37-71e8-48c7-be8c-44a893d9d02c">
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement style="Column_Header_Label" x="0" y="0" width="200" height="30" uuid="c389c922-e169-4064-8cef-cf29d52e732f"/>
-								<text><![CDATA[Month last year]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement style="Column_Cell" x="0" y="0" width="200" height="30" uuid="cbea2b0c-75b7-4846-b5f8-cba36213d198"/>
-								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null, "", TEXT($F{store_sales_1997}, "0.00") + " " + Currency.getInstance($P{REPORT_LOCALE}).getCurrencyCode())]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-					<jr:column width="162" uuid="4b6879ec-1bdc-4abd-9252-80ff5c7d11aa">
-						<jr:columnHeader style="Table_CH" height="30">
-							<staticText>
-								<reportElement style="Column_Header_Label" x="0" y="0" width="162" height="30" uuid="cc1fa1e8-5876-42a8-aa98-df8bc819fdf5"/>
-								<text><![CDATA[YOY %]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement style="Column_Cell_Conditional" x="0" y="0" width="162" height="30" uuid="e4d2b7c0-cdd1-41f4-93c2-1dd97e4765d0"/>
-								<textFieldExpression><![CDATA[IF($F{store_sales_1997} == null,"N/A",TEXT($F{store_sales_1998}.subtract($F{store_sales_1997}).divide($F{store_sales_1997}, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)),"+#,##0.00;-#") + " %")]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
 			</componentElement>
 		</band>
 	</summary>

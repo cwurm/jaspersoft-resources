@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
-<!-- 2015-01-23T23:55:11 -->
+<!-- 2015-01-26T14:00:20 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Wave_Book" pageWidth="595" pageHeight="842" sectionType="Part" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30" uuid="d2716064-8ae4-40cf-a575-33afba400e3a">
 	<property name="net.sf.jasperreports.print.create.bookmarks" value="true"/>
 	<property name="com.jaspersoft.studio.book.group.cover.header" value="Cover and Table of Contents"/>
@@ -45,7 +45,18 @@
 					<subreportParameter name="THE_MONTH">
 						<subreportParameterExpression><![CDATA[$P{THE_MONTH}]]></subreportParameterExpression>
 					</subreportParameter>
-					<subreportExpression><![CDATA["/Users/cwurm/git/jaspersoft-resources/Samples/Monthly Store Report/Stores_Overview.jrxml"]]></subreportExpression>
+					<subreportExpression><![CDATA["Stores_Overview.jrxml"]]></subreportExpression>
+				</p:subreportPart>
+			</part>
+			<part uuid="866dc570-8ce8-4020-a35e-2fea92323966">
+				<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd">
+					<subreportParameter name="REPORT_CONNECTION">
+						<subreportParameterExpression><![CDATA[$P{REPORT_CONNECTION}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="THE_MONTH">
+						<subreportParameterExpression><![CDATA[$P{THE_MONTH}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression><![CDATA["Stores_Overview_Table.jrxml"]]></subreportExpression>
 				</p:subreportPart>
 			</part>
 		</groupHeader>
@@ -71,6 +82,18 @@
 					<subreportParameterExpression><![CDATA[$P{THE_MONTH}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportExpression><![CDATA["Store.jrxml"]]></subreportExpression>
+			</p:subreportPart>
+		</part>
+		<part uuid="44f6e102-cec0-4804-9d87-7ee553189053">
+			<partNameExpression><![CDATA[$F{store_name} + " cont."]]></partNameExpression>
+			<p:subreportPart xmlns:p="http://jasperreports.sourceforge.net/jasperreports/parts" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/parts http://jasperreports.sourceforge.net/xsd/parts.xsd">
+				<subreportParameter name="REPORT_CONNECTION">
+					<subreportParameterExpression><![CDATA[$P{REPORT_CONNECTION}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="STORE_ID">
+					<subreportParameterExpression><![CDATA[$F{store_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportExpression><![CDATA["Store_Crosstab.jrxml"]]></subreportExpression>
 			</p:subreportPart>
 		</part>
 	</detail>
