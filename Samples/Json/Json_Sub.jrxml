@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-01-27T12:43:31 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Json_Sub" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="98f7fcfc-2924-4bae-a46c-893c6573a676">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="firstName" class="java.lang.String"/>
+	<field name="lastName" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<summary>
+		<band height="198" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="300" height="30" uuid="b0fda69c-4e5c-4207-a0b6-0b571972451c"/>
+				<textFieldExpression><![CDATA["Hello, " + $F{firstName} + " " + $F{lastName} + "!"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

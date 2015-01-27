@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
-<!-- 2015-01-23T17:36:56 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-01-27T12:48:25 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Stores" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="5eca4aba-9182-4586-9146-76df4e48a20b">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Foodmart (localhost)"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
@@ -16,7 +16,7 @@
 	<property name="ireport.jasperserver.user" value="jasperadmin"/>
 	<property name="ireport.jasperserver.report.resource" value="/public/Christoph/Wave_Book_files/Store.jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Wave_Book"/>
-	<style name="Text" fontName="GillSans" fontSize="12"/>
+	<style name="Text" fontSize="12"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#446AF2">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -44,10 +44,10 @@
 			<rightPen lineWidth="0.1" lineColor="#DDDDDD"/>
 		</box>
 	</style>
-	<style name="Table column header" forecolor="#FFFFFF" fontName="Futura" fontSize="16" isBold="false">
+	<style name="Table column header" forecolor="#FFFFFF" fontSize="16" isBold="false">
 		<box padding="3"/>
 	</style>
-	<style name="Table cell" fontName="GillSans" fontSize="12">
+	<style name="Table cell" fontSize="12">
 		<box padding="3"/>
 	</style>
 	<subDataset name="Sales" uuid="9f2c2247-9323-4958-a5f5-ece91414a392">
@@ -161,7 +161,7 @@ WHERE store.store_id = $P{STORE_ID}]]>
 				</reportElement>
 				<box padding="0"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="Left">
-					<font fontName="Futura" size="53"/>
+					<font size="53"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{store_name}]]></textFieldExpression>
 				<anchorNameExpression><![CDATA[$F{store_name}]]></anchorNameExpression>
