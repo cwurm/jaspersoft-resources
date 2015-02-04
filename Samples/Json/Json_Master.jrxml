@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.2.beta-v201501191618 using JasperReports Library version 6.0.2  -->
-<!-- 2015-02-04T10:00:10 -->
+<!-- 2015-02-04T12:01:27 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Json_Master" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e2b7fd43-5833-4565-9d1e-ca4406c75272">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="ireport.jasperserver.url" value="http://192.168.101.125:8080/jasperserver-pro/"/>
@@ -8,7 +8,8 @@
 	<property name="ireport.jasperserver.report.resource" value="/public/Christoph/Json_files/main_jrxml"/>
 	<property name="ireport.jasperserver.reportUnit" value="/public/Christoph/Json"/>
 	<parameter name="JSON" class="java.lang.String">
-		<defaultValueExpression><![CDATA["{\"firstName\": \"John\", \"lastName\": \"Smith\"}"]]></defaultValueExpression>
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["[{\"firstName\": \"John\", \"lastName\": \"Doe\", \"address\": {\"street\": \"Broadway\"}}, {\"firstName\": \"Jane\", \"lastName\": \"Smith\", \"address\": {\"street\": \"Main Street\"}}]"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[]]>
